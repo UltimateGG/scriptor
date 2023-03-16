@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect } from 'react';
 import { NotificationProvider } from './NotificationContext';
-import { hexToRgb, theme } from './theme/Theme';
+import { theme } from './theme/Theme';
 
 
 const getGlobalStyles = () => `

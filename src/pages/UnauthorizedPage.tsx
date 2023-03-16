@@ -15,6 +15,8 @@ const UnauthorizedPage = () => {
       <p style={{ marginTop: '1rem' }}>
         {user && user.email}
         <br />
+        <small>ID: {user && user.uid}</small>
+        <br />
         <small>Not you? <a onClick={logout} href="#">Sign in with a different account</a></small> {/* eslint-disable-line jsx-a11y/anchor-is-valid */}
       </p>
     </div>
