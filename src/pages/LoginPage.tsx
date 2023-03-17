@@ -10,7 +10,7 @@ const LoginPage = () => {
 
 
   useEffect(() => {
-    if (user) navigate('/chats');
+    if (user) navigate('/scripts');
   }, [user, navigate]);
 
   return (

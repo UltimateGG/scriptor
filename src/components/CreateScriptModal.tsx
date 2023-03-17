@@ -1,6 +1,8 @@
+import { push, ref } from 'firebase/database';
 import React, { useState } from 'react';
-import useAuthContext from '../contexts/AuthContext';
-import { Button, Modal, Progress, TextField } from '../Jet';
+import useScriptsContext from '../contexts/ScriptsContext';
+import { db } from '../firebase';
+import { Button, Modal, Progress, TextArea, TextField } from '../Jet';
 
 
 interface CreateScriptModalProps {
@@ -8,30 +10,22 @@ interface CreateScriptModalProps {
   onClose: () => void;
 }
 
-const isAsciiPrintable = (str: string) => /^[\x20-\x7E]*$/.test(str);
-
 const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
   const [name, setName] = useState<string>('');
   const [nameError, setNameError] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [descriptionError, setDescriptionError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const { scripts } = useScriptsContext();
 
-  const { user } = useAuthContext();
-  if (!user) return null;
-
-
-  const onNameChange = (str: string) => {
-    const typed = str.slice(name.length);
-    if (typed.length === 0) return setName(str);
-    if (typed.length === 0 || !isAsciiPrintable(typed) || str.length > 50) return;
-    
-    setName(str.trimStart());
-    setNameError('');
-  }
 
   const validate = () => {
     if (name.length === 0) return setNameError('Script name cannot be empty');
-    if (!isAsciiPrintable(name)) return setNameError('Invalid characters in name');
+    if (name.length > 100) return setNameError('Max 100 characters');
     setNameError('');
+
+    if (description.length > 500) return setDescriptionError(description.length + '/500');
+    setDescriptionError('');
 
     return true;
   }
@@ -39,18 +33,24 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
   const reset = () => {
     setName('');
     setNameError('');
+    setDescription('');
+    setDescriptionError('');
     setLoading(false);
   }
 
   const create = async () => {
     if (!validate()) return;
     setLoading(true);
-    // await ZentrixChat.create(name, encrypted, password, [ user.id ]);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setLoading(false);
+    await push(ref(db, 'scripts'), {
+      name,
+      description,
+    });
 
-    reset();
     onClose();
+    setTimeout(() => {
+      setLoading(false)
+      reset();
+    }, 300);
   }
 
   return (
@@ -62,30 +62,56 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
         onClose();
       }}
     >
-      <label htmlFor="script-name">Name</label><br />
-      <TextField
-        placeholder="Something cool.."
-        name="chat-name"
-        style={{ marginBottom: '1rem' }}
-        autoFocus
-        fullWidth
-        value={name}
-        onChanged={onNameChange}
-        error={nameError}
-        onBlur={validate}
-        disabled={loading}
-      />
+      {scripts.length >= 100 ? (
+        <p>You have reached the maximum number of scripts (100).</p>
+      ) : (
+        <>
+        <label htmlFor="script-name">Name</label><br />
+        <TextField
+          placeholder="Movie title.."
+          name="script-name"
+          style={{ marginBottom: '1rem' }}
+          autoFocus
+          fullWidth
+          value={name}
+          onChanged={(str) => {
+            setName(str.trimStart());
+            validate();
+          }}
+          error={nameError}
+          onBlur={validate}
+          disabled={loading}
+        />
 
-      <Button
-        style={{ marginTop: '1rem', marginBottom: '0.2rem' }}
-        block
-        onClick={create}
-        disabled={nameError.length > 0 || loading}
-      >
-        Create
-      </Button>
+        <label htmlFor="script-description">Description</label><br />
+        <TextArea
+          placeholder="Movie description.."
+          name="script-description"
+          style={{ marginBottom: '1rem' }}
+          maxRows={8}
+          fullWidth
+          value={description}
+          onChanged={(str) => {
+            setDescription(str.trimStart());
+            validate();
+          }}
+          error={descriptionError}
+          onBlur={validate}
+          disabled={loading}
+        />
 
-      {loading && <Progress indeterminate thin />}
+        <Button
+          style={{ marginTop: '1rem', marginBottom: '0.2rem' }}
+          block
+          onClick={create}
+          disabled={nameError.length > 0 || loading}
+        >
+          Create
+        </Button>
+
+        {loading && <Progress indeterminate thin />}
+        </>
+      )}
     </Modal>
   );
 }

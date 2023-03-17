@@ -1,5 +1,6 @@
+import { onValue, ref } from 'firebase/database';
 import React, { useContext, useEffect, useState } from 'react';
-import { Script } from '../firebase';
+import { db, Script } from '../firebase';
 
 
 interface IScriptsContext {
@@ -14,10 +15,29 @@ export const ScriptsContextProvider: React.FC<{children: React.ReactNode}> = ({ 
 
 
   useEffect(() => {
-    if (scripts.length !== 0) return;
-    
-    
-  }, [scripts]);
+    const unsubscribe = onValue(ref(db, 'scripts'), snapshot => {
+      if (snapshot.exists()) {
+        const val = snapshot.val();
+        const keys = Object.keys(val);
+        const scripts: Script[] = [];
+
+        keys.forEach(key => {
+          scripts.push({
+            id: key,
+            ...val[key],
+          });
+        });
+
+        setScripts(scripts);
+      } else {
+        setScripts([]);
+      }
+      
+      setLoadingScripts(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <ScriptsContext.Provider value={{ scripts, loadingScripts }}>
