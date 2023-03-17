@@ -44,6 +44,8 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
     await push(ref(db, 'scripts'), {
       name,
       description,
+      shots: [],
+      productionMode: false
     });
 
     onClose();

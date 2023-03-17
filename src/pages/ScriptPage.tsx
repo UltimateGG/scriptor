@@ -8,7 +8,7 @@ import Shot, { ShotStyle } from '../components/Shot';
 import useAuthContext from '../contexts/AuthContext';
 import useScriptsContext from '../contexts/ScriptsContext';
 import { db, Script, Shot as ShotType } from '../firebase';
-import { Box, Icon, IconEnum, Paper, theme } from '../Jet';
+import { Box, Icon, IconEnum, Switch, theme } from '../Jet';
 
 
 const TitleStyle = styled.h4`
@@ -16,7 +16,7 @@ const TitleStyle = styled.h4`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: calc(100% - 7.6rem);
+  max-width: calc(100% - 15rem);
 `;
 
 const PhantomSectionStyle = styled(ShotStyle)`
@@ -68,13 +68,13 @@ const ScriptPage = () => {
   }
 
   const createShot = () => {
-    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '' });
+    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '', completed: false });
   }
 
   if (!user || !script) return null;
   return (
     <>
-      <Box alignItems="center" style={{
+      <Box alignItems="center" justifyContent="space-between" style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -84,24 +84,31 @@ const ScriptPage = () => {
         padding: '1rem 0.2rem',
         backgroundColor: theme.colors.background[1]
       }}>
-        <Icon icon={IconEnum.left} style={{ cursor: 'pointer', marginRight: '0.2rem' }} size={32} onClick={() => navigate(-1)} />
-        <TitleStyle style={{ margin: 0 }}>{script.name}</TitleStyle>
+        <Box alignItems="center" style={{ width: '80%' }}>
+          <Icon icon={IconEnum.left} style={{ cursor: 'pointer', marginRight: '0.2rem' }} size={32} onClick={() => navigate(-1)} />
+          <TitleStyle style={{ margin: 0 }}>{script.name}</TitleStyle>
+        </Box>
+
+        <Box alignItems="center" style={{ marginRight: '2rem' }}>
+          <label htmlFor="prod" style={{ marginRight: '1rem' }}>Production Mode</label>
+          <Switch checked={script.productionMode} onCheck={checked => updateScript({ productionMode: checked })} name="prod" />
+        </Box>
       </Box>
       <Box flexDirection="column" style={{
         overflowY: 'auto',
         height: '100%',
         paddingTop: '6rem'
       }}>
-        <ShotStyle style={{ margin: '1rem 6rem', border: 0 }}>
+        <ShotStyle style={{ margin: '1rem 6rem 3.4rem 6rem', border: 0 }}>
           <small>Welcome to the script for</small>
           <div style={{ height: '1.2rem' }}></div>
           <EditableText variant="h1" value={script.name} maxLength={100} onChanged={str => updateScript({ name: str.trimStart() })} />
 
-          <EditableText value={script.description} onChanged={str => updateScript({ description: str.trimStart() })} maxLength={500} />
+          <EditableText markdown value={script.description} onChanged={str => updateScript({ description: str.trimStart() })} maxLength={100_000} />
         </ShotStyle>
 
         {script.shots.map((shot, i) => (
-          <Shot key={i} scriptId={script.id} shot={shot} num={i} onRemove={() => setDeleteShotModal(shot)} />
+          <Shot key={i} script={script} shot={shot} num={i} onRemove={() => setDeleteShotModal(shot)} />
         ))}
 
         <PhantomSectionStyle>

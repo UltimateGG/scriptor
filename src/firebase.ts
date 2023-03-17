@@ -23,12 +23,14 @@ export interface Script {
   name: string;
   description: string;
   shots: Shot[];
+  productionMode: boolean;
 }
 
 export interface Shot {
   id: string;
   name: string;
   description: string;
+  completed: boolean;
 }
 
 export {

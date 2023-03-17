@@ -1,8 +1,8 @@
 import { ref, update } from 'firebase/database';
 import React from 'react';
 import styled from 'styled-components';
-import { db, Shot as ShotType } from '../firebase';
-import { Icon, IconEnum, Paper, theme } from '../Jet';
+import { db, Script, Shot as ShotType } from '../firebase';
+import { Box, Checkbox, Icon, IconEnum, Paper, theme } from '../Jet';
 import EditableText from './EditableText';
 
 
@@ -24,29 +24,34 @@ const ContainerStyle = styled.div`
 `;
 
 export const ShotStyle = styled(Paper)`
+  transition: opacity 0.2s;
 `;
 
 interface ShotProps {
-  scriptId: string;
+  script: Script;
   shot: ShotType;
   num: number;
   onRemove: () => void;
 }
 
-const Shot = ({ scriptId, shot, num, onRemove } : ShotProps) => {
-  const updateShot = (field: string, value: string, maxLen: number) => {
-    update(ref(db, `scripts/${scriptId}/shots/${shot.id}`), {
-      [field]: value.substring(0, maxLen)
+const Shot = ({ script, shot, num, onRemove } : ShotProps) => {
+  const updateShot = (field: string, value: string | boolean, maxLen: number) => {
+    update(ref(db, `scripts/${script.id}/shots/${shot.id}`), {
+      [field]: typeof value === 'string' ? value.substring(0, maxLen) : value,
     });
   }
 
   return (
     <ContainerStyle>
-      <ShotStyle>
-        <h3>Shot #{num + 1}</h3>
+      <ShotStyle style={{ opacity: shot.completed && script.productionMode ? 0.45 : 1 }}>
+        <Box alignItems="center" style={{ marginBottom: '0.8rem' }} spacing="0.8rem">
+          {script.productionMode && <Checkbox style={{ display: 'inline-block' }} checked={shot.completed} onCheck={checked => updateShot('completed', checked, 100)} />}
+          <h3 style={{ display: 'inline-block', margin: 0 }}>Shot #{num + 1}</h3>
+        </Box>
+
         <EditableText variant="h5" value={shot.name} onChanged={value => updateShot('name', value, 500)} maxLength={500} style={{ fontWeight: 'bold' }} />
 
-        <EditableText value={shot.description} onChanged={value => updateShot('description', value, 100_000)} maxLength={100_000} />
+        <EditableText markdown value={shot.description} onChanged={value => updateShot('description', value, 100_000)} maxLength={100_000} />
 
         <Icon icon={IconEnum.minus_circle} onClick={onRemove} size={32} style={{ position: 'absolute', top: '50%', right: '2rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />
       </ShotStyle>

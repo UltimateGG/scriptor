@@ -16,6 +16,7 @@ export interface TextAreaProps extends React.HTMLAttributes<HTMLTextAreaElement>
   roomForError?: boolean;
   error?: string;
   name?: string;
+  autoFocus?: boolean;
   onHeightChange?: (height: number) => void;
 }
 
@@ -90,7 +91,7 @@ const ErrorTextStyle = styled.small`
  * @param props Use onChanged for onChange event
  */
 const TextArea = (props: TextAreaProps) => {
-  let { value, placeholder, onChanged, onBlur, disabled, fullWidth, minRows, maxRows, roomForError, error, onHeightChange, ...rest } = props;
+  let { value, placeholder, autoFocus, onChanged, onBlur, disabled, fullWidth, minRows, maxRows, roomForError, error, onHeightChange, ...rest } = props;
 
 
   if (error === '' || (error && error.trim() === ''))
@@ -111,6 +112,7 @@ const TextArea = (props: TextAreaProps) => {
         error={error}
         id={props.name}
         onHeightChange={onHeightChange}
+        autoFocus={autoFocus}
       />
 
       {(error || roomForError) && <ErrorTextStyle style={{ visibility: roomForError && !error ? 'hidden' : 'visible' }} theme={theme}>
