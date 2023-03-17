@@ -25,6 +25,7 @@ export const ScriptsContextProvider: React.FC<{children: React.ReactNode}> = ({ 
           scripts.push({
             id: key,
             ...val[key],
+            shots: val[key].shots ? Object.keys(val[key].shots).map(shotKey => ({ id: shotKey, ...val[key].shots[shotKey] })) : [],
           });
         });
 

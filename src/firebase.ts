@@ -22,6 +22,13 @@ export interface Script {
   id: string;
   name: string;
   description: string;
+  shots: Shot[];
+}
+
+export interface Shot {
+  id: string;
+  name: string;
+  description: string;
 }
 
 export {

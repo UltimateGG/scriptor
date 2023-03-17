@@ -1,11 +1,13 @@
-import { ref, update } from 'firebase/database';
+import { push, ref, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import DeleteShotModal from '../components/DeleteShotModal';
 import EditableText from '../components/EditableText';
+import Shot, { ShotStyle } from '../components/Shot';
 import useAuthContext from '../contexts/AuthContext';
 import useScriptsContext from '../contexts/ScriptsContext';
-import { db, Script } from '../firebase';
+import { db, Script, Shot as ShotType } from '../firebase';
 import { Box, Icon, IconEnum, Paper, theme } from '../Jet';
 
 
@@ -17,17 +19,14 @@ const TitleStyle = styled.h4`
   max-width: calc(100% - 7.6rem);
 `;
 
-const SectionStyle = styled(Paper)`
-  margin: 1rem 6rem;
-`;
-
-const PhantomSectionStyle = styled(SectionStyle)`
+const PhantomSectionStyle = styled(ShotStyle)`
   position: relative;
   margin-left: 0;
   margin-right: 0;
   margin-bottom: 24rem;
   width: 100%;
-  min-height: 14rem;
+  min-height: 8rem;
+  max-height: 8rem;
   height: 100%;
   background-color: transparent;
   border: none;
@@ -52,6 +51,7 @@ const ScriptPage = () => {
   const { user } = useAuthContext();
   const { scripts } = useScriptsContext();
   const [script, setScript] = useState<Script | null>(null);
+  const [deleteShotModal, setDeleteShotModal] = useState<ShotType | null>(null);
   const navigate = useNavigate();
 
   
@@ -66,7 +66,10 @@ const ScriptPage = () => {
   const updateScript = (values: any) => {
     update(ref(db, `scripts/${scriptId}`), values);
   }
-      
+
+  const createShot = () => {
+    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '' });
+  }
 
   if (!user || !script) return null;
   return (
@@ -89,31 +92,24 @@ const ScriptPage = () => {
         height: '100%',
         paddingTop: '6rem'
       }}>
-        <SectionStyle>
-          <EditableText variant="h1" value={script.name} onChanged={str => {
-            let cleanName = str.trimStart();
-            if (cleanName.length > 100) cleanName = cleanName.slice(0, 100);
+        <ShotStyle style={{ margin: '1rem 6rem', border: 0 }}>
+          <small>Welcome to the script for</small>
+          <div style={{ height: '1.2rem' }}></div>
+          <EditableText variant="h1" value={script.name} maxLength={100} onChanged={str => updateScript({ name: str.trimStart() })} />
 
-            updateScript({ name: cleanName });
-          }} />
-          <EditableText value={script.description} onChanged={str => {
-            let cleanDescription = str.trimStart();
-            if (cleanDescription.length > 500) cleanDescription = cleanDescription.slice(0, 500);
+          <EditableText value={script.description} onChanged={str => updateScript({ description: str.trimStart() })} maxLength={500} />
+        </ShotStyle>
 
-            updateScript({ description: cleanDescription });
-          }} />
-        </SectionStyle>
-
-        {[].map((_, i) => (
-          <SectionStyle key={i}>
-            <h1>{_}</h1>
-          </SectionStyle>
+        {script.shots.map((shot, i) => (
+          <Shot key={i} scriptId={script.id} shot={shot} num={i} onRemove={() => setDeleteShotModal(shot)} />
         ))}
 
         <PhantomSectionStyle>
-          <Icon icon={IconEnum.plus_circle} size={32} style={{ position: 'absolute', top: '50%', right: '3rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />
+          <Icon onClick={createShot} icon={IconEnum.plus_circle} size={32} style={{ position: 'absolute', top: '50%', right: '3rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />
         </PhantomSectionStyle>
       </Box>
+
+      <DeleteShotModal shot={deleteShotModal} script={script} open={deleteShotModal !== null} onClose={() => setDeleteShotModal(null)} />
     </>
   );
 }
