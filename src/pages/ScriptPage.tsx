@@ -9,7 +9,7 @@ import useAuthContext from '../contexts/AuthContext';
 import useScriptsContext from '../contexts/ScriptsContext';
 import { db, Script, Shot as ShotType } from '../firebase';
 import { Box, Icon, IconEnum, Switch, theme } from '../Jet';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable } from '@hello-pangea/dnd';
 import { StrictModeDroppable } from '../components/StrictModeDroppable';
 
 

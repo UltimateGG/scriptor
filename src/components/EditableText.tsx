@@ -33,7 +33,10 @@ interface EditableTextProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, ...rest }: EditableTextProps) => {
   const [editing, setEditing] = useState(false);
+  const [val, setVal] = useState(value);
 
+
+  useEffect(() => setVal(value), [value]);
 
   useEffect(() => {
     const onClick = (e: any) => {
@@ -46,13 +49,17 @@ const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, ..
 
   const Tag = markdown ? ReactMarkdown : variant;
   return editing ? (
-    <InputStyle autoFocus value={value} onChange={(e: any) => onChanged && onChanged(e.target.value.substring(0, maxLength))} onBlur={() => setEditing(false)} />
+    <InputStyle autoFocus value={val} onChanged={str => {
+      str = str.substring(0, maxLength || 100_000);
+      setVal(str);
+      onChanged && onChanged(str);
+    }} onBlur={() => setEditing(false)} />
   ) : (
     <div style={{
         cursor: 'text',
-        backgroundColor: value === '' ? 'rgba(0, 0, 0, 0.25)' : undefined,
-        padding: value === '' ? '0.5rem' : undefined,
-        borderRadius: value === '' ? '0.25rem' : undefined,
+        backgroundColor: val === '' ? 'rgba(0, 0, 0, 0.25)' : undefined,
+        padding: val === '' ? '0.5rem' : undefined,
+        borderRadius: val === '' ? '0.25rem' : undefined,
       }}
       onClick={() => setEditing(true)}
     >
@@ -65,7 +72,7 @@ const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, ..
         {...(markdown ? { remarkPlugins: [remarkGfm], linkTarget: '_blank' } : {})}
         className="markdown-body"
       >
-        {value === '' ? '(Click to edit)' : value}
+        {val === '' ? '(Click to edit)' : val}
       </Tag>
     </div>
   );
