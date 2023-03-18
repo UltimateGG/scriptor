@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import styled from 'styled-components';
@@ -34,6 +34,15 @@ interface EditableTextProps extends React.HTMLAttributes<HTMLDivElement> {
 const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, ...rest }: EditableTextProps) => {
   const [editing, setEditing] = useState(false);
 
+
+  useEffect(() => {
+    const onClick = (e: any) => {
+      if (e.target.tagName !== 'TEXTAREA') setEditing(false);
+    }
+
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
 
   const Tag = markdown ? ReactMarkdown : variant;
   return editing ? (

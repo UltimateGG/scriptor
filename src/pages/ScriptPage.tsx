@@ -9,6 +9,9 @@ import useAuthContext from '../contexts/AuthContext';
 import useScriptsContext from '../contexts/ScriptsContext';
 import { db, Script, Shot as ShotType } from '../firebase';
 import { Box, Icon, IconEnum, Switch, theme } from '../Jet';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { StrictModeDroppable } from '../components/StrictModeDroppable';
+
 
 
 const TitleStyle = styled.h4`
@@ -17,6 +20,16 @@ const TitleStyle = styled.h4`
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: calc(100% - 15rem);
+`;
+
+const IntroStyle = styled(ShotStyle)`
+  border: 0;
+  margin: 1rem 6rem;
+  margin-bottom: 3.4rem;
+
+  @media (max-width: 768px) {
+    margin: 1rem 2rem;
+  }
 `;
 
 const PhantomSectionStyle = styled(ShotStyle)`
@@ -68,7 +81,23 @@ const ScriptPage = () => {
   }
 
   const createShot = () => {
-    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '', completed: false });
+    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '', completed: false, order: script?.shots?.length || 0 });
+  }
+
+  const onDragEnd = (result: any) => {
+    if (!result.destination || !script) return;
+
+    const shot = script.shots.find(shot => shot.id === result.draggableId);
+    if (!shot) return;
+
+    const shots = script.shots.filter(shot => shot.id !== result.draggableId);
+    shots.splice(result.destination.index, 0, shot);
+
+    const newArr = shots.map((shot, i) => ({ ...shot, order: i }));
+    const fbObj: Record<string, ShotType> = {};
+
+    newArr.forEach((shot, i) => fbObj[shot.id] = shot);
+    updateScript({ shots: fbObj });
   }
 
   if (!user || !script) return null;
@@ -99,17 +128,39 @@ const ScriptPage = () => {
         height: '100%',
         paddingTop: '6rem'
       }}>
-        <ShotStyle style={{ margin: '1rem 6rem 3.4rem 6rem', border: 0 }}>
+        <IntroStyle>
           <small>Welcome to the script for</small>
           <div style={{ height: '1.2rem' }}></div>
           <EditableText variant="h1" value={script.name} maxLength={100} onChanged={str => updateScript({ name: str.trimStart() })} />
 
           <EditableText markdown value={script.description} onChanged={str => updateScript({ description: str.trimStart() })} maxLength={100_000} />
-        </ShotStyle>
+        </IntroStyle>
 
-        {script.shots.map((shot, i) => (
-          <Shot key={i} script={script} shot={shot} num={i} onRemove={() => setDeleteShotModal(shot)} />
-        ))}
+        <DragDropContext onDragEnd={onDragEnd}>
+          <StrictModeDroppable droppableId="droppable">
+            {(provided, snapshot) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                {script.shots.sort((a, b) => a.order - b.order).map((shot, i) => (
+                  <Draggable key={shot.id} draggableId={shot.id} index={i} isDragDisabled={script.productionMode}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <Shot key={i} script={script} shot={shot} num={i} onRemove={() => setDeleteShotModal(shot)} />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </StrictModeDroppable>
+        </DragDropContext>
 
         <PhantomSectionStyle>
           <Icon onClick={createShot} icon={IconEnum.plus_circle} size={32} style={{ position: 'absolute', top: '50%', right: '3rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />

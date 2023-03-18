@@ -21,6 +21,10 @@ const ContainerStyle = styled.div`
       display: block;
     }
   }
+
+  @media (max-width: 768px) {
+    padding: 1rem 2rem;
+  }
 `;
 
 export const ShotStyle = styled(Paper)`

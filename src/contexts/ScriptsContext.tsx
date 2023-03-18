@@ -1,6 +1,7 @@
 import { onValue, ref } from 'firebase/database';
 import React, { useContext, useEffect, useState } from 'react';
 import { db, Script } from '../firebase';
+import useAuthContext from './AuthContext';
 
 
 interface IScriptsContext {
@@ -12,6 +13,7 @@ export const ScriptsContext = React.createContext<IScriptsContext | undefined>(u
 export const ScriptsContextProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [scripts, setScripts] = useState<Script[]>([]);
   const [loadingScripts, setLoadingScripts] = useState(true);
+  const { user } = useAuthContext();
 
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export const ScriptsContextProvider: React.FC<{children: React.ReactNode}> = ({ 
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   return (
     <ScriptsContext.Provider value={{ scripts, loadingScripts }}>

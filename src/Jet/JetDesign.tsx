@@ -51,6 +51,8 @@ const getGlobalStyles = () => `
     color: ${theme.colors.primary[0]};
     text-decoration: none;
     transition: color 0.3s ease-in-out;
+    word-break: break-word;
+    word-wrap: break-word;
   }
 
   a:hover {
@@ -138,6 +140,8 @@ const getGlobalStyles = () => `
 
   ul, ol {
     list-style-position: inside;
+    margin: -1.4rem;
+    margin-left: 0.2rem;
   }
 
   ul > li {

@@ -28,6 +28,7 @@ export interface Script {
 
 export interface Shot {
   id: string;
+  order: number;
   name: string;
   description: string;
   completed: boolean;
