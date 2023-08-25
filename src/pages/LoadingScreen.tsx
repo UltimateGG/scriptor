@@ -38,7 +38,7 @@ const LoadingScreen = ({ status }: ILoadingScreenProps) => {
     <Box flexDirection="column" justifyContent="center" alignItems="center" style={{ height: '100%' }}>
       <StatusStyle>{status}</StatusStyle>
 
-      <LogoStyle src={`${process.env.PUBLIC_URL}/logo192.png`} alt="Scriptor" />
+      <LogoStyle src="/logo192.png" alt="Scriptor" />
     </Box>
   );
 }

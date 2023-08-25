@@ -15,10 +15,10 @@ const LoginPage = () => {
 
   return (
     <Box flexDirection="column" justifyContent="center" alignItems="center" style={{ height: '100%' }}>
-      <img src={process.env.PUBLIC_URL + '/logo192.png'} alt="Scriptor" style={{ width: '6rem', height: '6rem' }} />
+      <img src="/logo192.png" alt="Scriptor" style={{ width: '6rem', height: '6rem' }} />
       <p style={{ margin: '1rem 0' }}>Sign in to Scriptor</p>
 
-      <img src={process.env.PUBLIC_URL + '/google_signin.png'} alt="Sign in with Google" onClick={signInWithGoogle} style={{ cursor: 'pointer', width: '200px' }} />
+      <img src="/google_signin.png" alt="Sign in with Google" onClick={signInWithGoogle} style={{ cursor: 'pointer', width: '200px' }} />
     </Box>
   );
 }

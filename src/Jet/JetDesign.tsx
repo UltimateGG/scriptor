@@ -6,8 +6,8 @@ import { theme } from './theme/Theme';
 const getGlobalStyles = () => `
   @font-face {
     font-family: 'Rubik';
-    src: url('${process.env.PUBLIC_URL}/fonts/Rubik-VariableFont_wght.ttf') format('truetype'),
-         url('${process.env.PUBLIC_URL}/fonts/Rubik-Italic-VariableFont_wght.ttf') format('truetype');
+    src: url('/fonts/Rubik-VariableFont_wght.ttf') format('truetype'),
+         url('/fonts/Rubik-Italic-VariableFont_wght.ttf') format('truetype');
   }
 
   * {
