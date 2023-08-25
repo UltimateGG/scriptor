@@ -1,7 +1,7 @@
 import { ref, remove } from 'firebase/database';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { db, Script, Shot } from '../firebase';
-import { Button, Modal, Progress } from '../Jet';
+import { Button, Modal, Progress } from '@ultimategg/jetdesign';
 
 
 interface DeleteShotModalProps {
@@ -32,23 +32,27 @@ const DeleteShotModal = ({ script, shot, open, onClose }: DeleteShotModalProps) 
       <p>Are you sure you want to delete "{shot?.name}"?</p>
       <p>This action cannot be undone.</p>
 
-      <Button
-        color="danger"
-        style={{ margin: '2rem 0 1rem 0' }}
-        block
-        onClick={deleteShot}
-      >
-        Delete
-      </Button>
-      <Button
-        color="secondary"
-        block
-        onClick={onClose}
-      >
-        Cancel
-      </Button>
+      
+      <div className="flex gap-2 mt-4 justify-end">
+        <Button
+          display="text"
+          color="secondary"
+          onClick={onClose}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
 
-      {loading && <Progress indeterminate thin />}
+        <Button
+          color="danger"
+          onClick={deleteShot}
+          disabled={loading}
+        >
+          Delete
+        </Button>
+      </div>
+
+      {loading && <Progress linear />}
     </Modal>
   );
 }

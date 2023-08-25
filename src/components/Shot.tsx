@@ -1,35 +1,8 @@
 import { ref, update } from 'firebase/database';
-import React from 'react';
-import styled from 'styled-components';
 import { db, Script, Shot as ShotType } from '../firebase';
-import { Box, Checkbox, Icon, IconEnum, Paper, theme } from '../Jet';
 import EditableText from './EditableText';
+import { Checkbox, Icon } from '@ultimategg/jetdesign';
 
-
-const ContainerStyle = styled.div`
-  position: relative;
-  padding: 1rem 6rem;
-
-  & > div > svg {
-    display: none;
-  }
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.02);
-
-    & > div > svg {
-      display: block;
-    }
-  }
-
-  @media (max-width: 768px) {
-    padding: 1rem 2rem;
-  }
-`;
-
-export const ShotStyle = styled(Paper)`
-  transition: opacity 0.2s;
-`;
 
 interface ShotProps {
   script: Script;
@@ -46,20 +19,20 @@ const Shot = ({ script, shot, num, onRemove } : ShotProps) => {
   }
 
   return (
-    <ContainerStyle>
-      <ShotStyle style={{ opacity: shot.completed && script.productionMode ? 0.45 : 1 }}>
-        <Box alignItems="center" style={{ marginBottom: '0.8rem' }} spacing="0.8rem">
-          {script.productionMode && <Checkbox style={{ display: 'inline-block' }} checked={shot.completed} onCheck={checked => updateShot('completed', checked, 100)} />}
-          <h3 style={{ display: 'inline-block', margin: 0 }}>Shot #{num + 1}</h3>
-        </Box>
+    <div className="shot-container">
+      <div className="bg-background-700 p-2 rounded transition-opacity duration-200" style={{ opacity: shot.completed && script.productionMode ? 0.45 : 1 }}>
+        <div className="flex items-center gap-4" style={{ marginBottom: '0.8rem' }}>
+          {script.productionMode && <Checkbox value={shot.completed} onChange={checked => updateShot('completed', checked, 100)} />}
+          <h5 style={{ margin: 0 }}>Shot #{num + 1}</h5>
+        </div>
 
-        <EditableText variant="h5" value={shot.name} onChanged={value => updateShot('name', value, 500)} maxLength={500} style={{ fontWeight: 'bold' }} />
+        <EditableText variant="h5" value={shot.name} onChanged={value => updateShot('name', value, 500)} maxLength={500} style={{ fontWeight: 'bold' }} disabled={script.productionMode && shot.completed} />
 
-        <EditableText markdown value={shot.description} onChanged={value => updateShot('description', value, 100_000)} maxLength={100_000} />
+        <EditableText markdown value={shot.description} onChanged={value => updateShot('description', value, 100_000)} maxLength={100_000} disabled={script.productionMode && shot.completed} />
 
-        <Icon icon={IconEnum.minus_circle} onClick={onRemove} size={32} style={{ position: 'absolute', top: '50%', right: '2rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />
-      </ShotStyle>
-    </ContainerStyle>
+        <Icon icon="minus-circle" onClick={onRemove} size={32} style={{ position: 'absolute', top: '50%', right: '2rem', transform: 'translateY(-50%)' }} color="text-950" />
+      </div>
+    </div>
   );
 }
 

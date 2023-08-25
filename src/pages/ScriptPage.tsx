@@ -1,62 +1,15 @@
 import { push, ref, update } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import DeleteShotModal from '../components/DeleteShotModal';
 import EditableText from '../components/EditableText';
-import Shot, { ShotStyle } from '../components/Shot';
+import Shot from '../components/Shot';
 import useAuthContext from '../contexts/AuthContext';
 import useScriptsContext from '../contexts/ScriptsContext';
 import { db, Script, Shot as ShotType } from '../firebase';
-import { Box, Icon, IconEnum, Switch, theme } from '../Jet';
 import { DragDropContext, Draggable } from '@hello-pangea/dnd';
 import { StrictModeDroppable } from '../components/StrictModeDroppable';
-
-
-
-const TitleStyle = styled.h4`
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: calc(100% - 15rem);
-`;
-
-const IntroStyle = styled(ShotStyle)`
-  border: 0;
-  margin: 1rem 6rem;
-  margin-bottom: 3.4rem;
-
-  @media (max-width: 768px) {
-    margin: 1rem 2rem;
-  }
-`;
-
-const PhantomSectionStyle = styled(ShotStyle)`
-  position: relative;
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: 24rem;
-  width: 100%;
-  min-height: 8rem;
-  max-height: 8rem;
-  height: 100%;
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
-
-  & > * {
-    display: none;
-  }
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.02);
-
-    & > * {
-      display: block;
-    }
-  }
-`;
+import { Checkbox, Icon } from '@ultimategg/jetdesign';
 
 
 const ScriptPage = () => {
@@ -103,7 +56,7 @@ const ScriptPage = () => {
   if (!user || !script) return null;
   return (
     <>
-      <Box alignItems="center" justifyContent="space-between" style={{
+      <div className="flex items-center justify-between bg-background-800" style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -111,30 +64,28 @@ const ScriptPage = () => {
         zIndex: 2,
         height: '3.6rem',
         padding: '1rem 0.2rem',
-        backgroundColor: theme.colors.background[1]
       }}>
-        <Box alignItems="center" style={{ width: '80%' }}>
-          <Icon icon={IconEnum.left} style={{ cursor: 'pointer', marginRight: '0.2rem' }} size={32} onClick={() => navigate(-1)} />
-          <TitleStyle style={{ margin: 0 }}>{script.name}</TitleStyle>
-        </Box>
+        <div className="flex items-center" style={{ width: '80%' }}>
+          <Icon icon="chevron-left" style={{ marginRight: '0.2rem' }} size={32} onClick={() => navigate(-1)} />
+          <h5 className="script-title" style={{ margin: 0 }}>{script.name}</h5>
+        </div>
 
-        <Box alignItems="center" style={{ marginRight: '2rem' }}>
-          <label htmlFor="prod" style={{ marginRight: '1rem' }}>Production Mode</label>
-          <Switch checked={script.productionMode} onCheck={checked => updateScript({ productionMode: checked })} name="prod" />
-        </Box>
-      </Box>
-      <Box flexDirection="column" style={{
+        <div className="flex items-center" style={{ marginRight: '2rem' }}>
+          <Checkbox isSwitch value={script.productionMode} onChange={c => updateScript({ productionMode: c })} label="Production Mode" />
+        </div>
+      </div>
+      <div className="flex flex-col" style={{
         overflowY: 'auto',
         height: '100%',
         paddingTop: '6rem'
       }}>
-        <IntroStyle>
+        <div className="intro bg-background-700 p-2 rounded">
           <small>Welcome to the script for</small>
           <div style={{ height: '1.2rem' }}></div>
-          <EditableText variant="h1" value={script.name} maxLength={100} onChanged={str => updateScript({ name: str.trimStart() })} />
+          <EditableText variant="h3" value={script.name} maxLength={100} onChanged={str => updateScript({ name: str.trimStart() })} />
 
           <EditableText markdown value={script.description} onChanged={str => updateScript({ description: str.trimStart() })} maxLength={100_000} />
-        </IntroStyle>
+        </div>
 
         <DragDropContext onDragEnd={onDragEnd}>
           <StrictModeDroppable droppableId="droppable">
@@ -162,10 +113,10 @@ const ScriptPage = () => {
           </StrictModeDroppable>
         </DragDropContext>
 
-        <PhantomSectionStyle>
-          <Icon onClick={createShot} icon={IconEnum.plus_circle} size={32} style={{ position: 'absolute', top: '50%', right: '3rem', transform: 'translateY(-50%)', cursor: 'pointer' }} color={theme.colors.background[9]} />
-        </PhantomSectionStyle>
-      </Box>
+        <div className="phantom-section">
+          <Icon onClick={createShot} icon="plus-circle" size={32} style={{ position: 'absolute', top: '50%', right: '3rem', transform: 'translateY(-50%)' }} color="text-950" />
+        </div>
+      </div>
 
       <DeleteShotModal shot={deleteShotModal} script={script} open={deleteShotModal !== null} onClose={() => setDeleteShotModal(null)} />
     </>

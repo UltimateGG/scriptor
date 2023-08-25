@@ -1,8 +1,8 @@
 import { push, ref } from 'firebase/database';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import useScriptsContext from '../contexts/ScriptsContext';
 import { db } from '../firebase';
-import { Button, Modal, Progress, TextArea, TextField } from '../Jet';
+import { Button, Modal, TextField } from '@ultimategg/jetdesign';
 
 
 interface CreateScriptModalProps {
@@ -13,8 +13,6 @@ interface CreateScriptModalProps {
 const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
   const [name, setName] = useState<string>('');
   const [nameError, setNameError] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [descriptionError, setDescriptionError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { scripts } = useScriptsContext();
 
@@ -24,17 +22,12 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
     if (name.length > 100) return setNameError('Max 100 characters');
     setNameError('');
 
-    if (description.length > 500) return setDescriptionError(description.length + '/500');
-    setDescriptionError('');
-
     return true;
   }
 
   const reset = () => {
     setName('');
     setNameError('');
-    setDescription('');
-    setDescriptionError('');
     setLoading(false);
   }
 
@@ -43,7 +36,7 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
     setLoading(true);
     await push(ref(db, 'scripts'), {
       name,
-      description,
+      description: '(Click to edit)',
       shots: [],
       productionMode: false
     });
@@ -68,15 +61,15 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
         <p>You have reached the maximum number of scripts (100).</p>
       ) : (
         <>
-        <label htmlFor="script-name">Name</label><br />
         <TextField
+          label="Name"
           placeholder="Movie title.."
           name="script-name"
+          className="w-full"
           style={{ marginBottom: '1rem' }}
           autoFocus
-          fullWidth
           value={name}
-          onChanged={(str) => {
+          onChange={str => {
             setName(str.trimStart());
             validate();
           }}
@@ -85,33 +78,14 @@ const CreateScriptModal = ({ open, onClose }: CreateScriptModalProps) => {
           disabled={loading}
         />
 
-        <label htmlFor="script-description">Description</label><br />
-        <TextArea
-          placeholder="Movie description.."
-          name="script-description"
-          style={{ marginBottom: '1rem' }}
-          maxRows={8}
-          fullWidth
-          value={description}
-          onChanged={(str) => {
-            setDescription(str.trimStart());
-            validate();
-          }}
-          error={descriptionError}
-          onBlur={validate}
-          disabled={loading}
-        />
-
         <Button
-          style={{ marginTop: '1rem', marginBottom: '0.2rem' }}
-          block
+          className="w-full mt-4"
           onClick={create}
           disabled={nameError.length > 0 || loading}
+          loading={loading}
         >
           Create
         </Button>
-
-        {loading && <Progress indeterminate thin />}
         </>
       )}
     </Modal>

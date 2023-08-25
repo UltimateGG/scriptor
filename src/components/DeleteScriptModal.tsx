@@ -1,7 +1,7 @@
 import { ref, remove } from 'firebase/database';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { db, Script } from '../firebase';
-import { Button, Modal, Progress } from '../Jet';
+import { Button, Modal, Progress } from '@ultimategg/jetdesign';
 
 
 interface DeleteScriptModalProps {
@@ -25,28 +25,31 @@ const DeleteScriptModal = ({ script, open, onClose }: DeleteScriptModalProps) =>
       title="Delete Script"
       open={open}
       onClose={onClose}
-      closeOnOutsideClick
+      closeOnOutsideClick={!loading}
     >
       <p>Are you sure you want to delete "{script?.name}"?</p>
       <p>This action cannot be undone.</p>
 
-      <Button
-        color="danger"
-        style={{ margin: '2rem 0 1rem 0' }}
-        block
-        onClick={deleteScript}
-      >
-        Delete
-      </Button>
-      <Button
-        color="secondary"
-        block
-        onClick={onClose}
-      >
-        Cancel
-      </Button>
+      <div className="flex gap-2 mt-4 justify-end">
+        <Button
+          display="text"
+          color="secondary"
+          onClick={onClose}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
 
-      {loading && <Progress indeterminate thin />}
+        <Button
+          color="danger"
+          onClick={deleteScript}
+          disabled={loading}
+        >
+          Delete
+        </Button>
+      </div>
+
+      {loading && <Progress linear />}
     </Modal>
   );
 }

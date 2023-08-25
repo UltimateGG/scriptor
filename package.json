@@ -9,6 +9,8 @@
     "@types/react-dom": "^18.0.10",
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.26",
+    "@ultimategg/jetdesign": "^0.2.2",
+    "@vitejs/plugin-react": "^4.0.4",
     "firebase": "^9.16.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -18,7 +20,6 @@
     "remark-gfm": "^3.0.1",
     "styled-components": "^5.3.6",
     "typescript": "^4.9.5",
-    "@vitejs/plugin-react": "^4.0.4",
     "vite": "^4.4.9"
   },
   "scripts": {
