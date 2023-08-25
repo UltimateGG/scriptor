@@ -1,4 +1,4 @@
-import { TextField } from '@ultimategg/jetdesign';
+import { TextField, useDebounce } from '@ultimategg/jetdesign';
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -16,9 +16,12 @@ interface EditableTextProps extends React.HTMLAttributes<HTMLDivElement> {
 const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, disabled, ...rest }: EditableTextProps) => {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
+  const debounce = useDebounce(val, 200);
 
 
   useEffect(() => setVal(value), [value]);
+
+  useEffect(() => onChanged && onChanged(debounce), [debounce]);
 
   useEffect(() => {
     const onClick = (e: any) => {
@@ -42,14 +45,14 @@ const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, di
     <TextField multiline className="editable-text" autoFocus value={val} onChange={str => {
       str = str.substring(0, maxLength || 100_000);
       setVal(str);
-      onChanged && onChanged(str);
-    }} onBlur={() => setEditing(true)} />
+    }} onBlur={() => setEditing(false)} />
   ) : (
     <div style={{
         cursor: 'text',
         backgroundColor: val === '' ? 'rgba(0, 0, 0, 0.25)' : undefined,
         padding: val === '' ? '0.5rem' : undefined,
         borderRadius: val === '' ? '0.25rem' : undefined,
+        overflow: 'hidden',
       }}
       onClick={() => !disabled && setEditing(true)}
     >
