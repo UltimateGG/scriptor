@@ -16,12 +16,12 @@ interface EditableTextProps extends React.HTMLAttributes<HTMLDivElement> {
 const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, disabled, ...rest }: EditableTextProps) => {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(value);
-  const debounce = useDebounce(val, 200);
+  // const debounce = useDebounce(val, 200);
 
 
   useEffect(() => setVal(value), [value]);
 
-  useEffect(() => onChanged && onChanged(debounce), [debounce]);
+  // useEffect(() => onChanged && onChanged(debounce), [debounce]);
 
   useEffect(() => {
     const onClick = (e: any) => {
@@ -45,6 +45,7 @@ const EditableText = ({ variant = 'p', value, maxLength, markdown, onChanged, di
     <TextField multiline className="editable-text" autoFocus value={val} onChange={str => {
       str = str.substring(0, maxLength || 100_000);
       setVal(str);
+      onChanged && onChanged(str);
     }} onBlur={() => setEditing(false)} />
   ) : (
     <div style={{

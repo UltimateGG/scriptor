@@ -34,7 +34,7 @@ const ScriptPage = () => {
   }
 
   const createShot = () => {
-    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Shot', description: '', completed: false, order: script?.shots?.length || 0 });
+    push(ref(db, `scripts/${scriptId}/shots`), { name: 'New Scene', description: '', completed: false, order: script?.shots?.length || 0 });
   }
 
   const onDragEnd = (result: any) => {

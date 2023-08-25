@@ -23,7 +23,7 @@ const Shot = ({ script, shot, num, onRemove } : ShotProps) => {
       <div className="bg-background-700 p-2 rounded transition-opacity duration-200" style={{ opacity: shot.completed && script.productionMode ? 0.45 : 1 }}>
         <div className="flex items-center gap-4" style={{ marginBottom: '0.8rem' }}>
           {script.productionMode && <Checkbox value={shot.completed} onChange={checked => updateShot('completed', checked, 100)} />}
-          <h5 style={{ margin: 0 }}>Shot #{num + 1}</h5>
+          <h5 style={{ margin: 0 }}>Scene #{num + 1}</h5>
         </div>
 
         <EditableText variant="h5" value={shot.name} onChanged={value => updateShot('name', value, 500)} maxLength={500} style={{ fontWeight: 'bold' }} disabled={script.productionMode && shot.completed} />

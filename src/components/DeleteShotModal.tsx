@@ -24,7 +24,7 @@ const DeleteShotModal = ({ script, shot, open, onClose }: DeleteShotModalProps) 
 
   return (
     <Modal
-      title="Delete Shot"
+      title="Delete Scene"
       open={open}
       onClose={onClose}
       closeOnOutsideClick
